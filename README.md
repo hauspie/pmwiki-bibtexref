@@ -79,10 +79,10 @@ with your keyword.
 Contributors
 ============
 
-Alexandre Courbot (http://www.gnurou.org/)
-Michaël Hauspie (http://www.lifl.fr/~hauspie)
-Yann Hodique (http://www.hodique.info/)
-Romain Rouvoy (http://www.lifl.fr/~rouvoy)
+* Alexandre Courbot (http://www.gnurou.org/)
+* Michaël Hauspie (http://www.lifl.fr/~hauspie)
+* Yann Hodique (http://www.hodique.info/)
+* Romain Rouvoy (http://www.lifl.fr/~rouvoy)
 
 Copyright
 =========
