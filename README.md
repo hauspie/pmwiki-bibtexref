@@ -46,27 +46,30 @@ either using PmWiki upload facility, or by copying them to
 uploads/Group/. Bibliography files are only usable within the group they are
 uploaded from.
 
-Citations are made with the tags {[...]} with the form:
-{[bibfile.bib,reference]}. They will expand to a clickable [reference] that
+Citations are made with the tags `{[...]}` with the form:
+`{[bibfile.bib,reference]}`. They will expand to a clickable `[reference]` that
 will automatically direct you to the whole bibtex entry.
 
 You can also cite the entry summary using
- bibtexsummary:[bibfile.bib,reference].
+
+    bibtexsummary:[bibfile.bib,reference].
 
 Or you can quote the complete bibtex entry with
- bibtexcomplete:[bibfile.bib,reference].
+
+    bibtexcomplete:[bibfile.bib,reference].
 
 You can also make bibtex queries, using the following syntax:
-  bibtexquery:[bibfile.bib],[select rule][sort rule][limit rule]
+
+    bibtexquery:[bibfile.bib],[select rule][sort rule][limit rule]
 
 "select rule", "sort rule" and "limit rule" are directly PHP code. An example
 is much better than any explanation here:
   
-  bibtexquery:[bibfile.bib][$this->get('YEAR') == '2004'][!$this->get('PUBDATE')][5]
+    bibtexquery:[bibfile.bib][$this->get('YEAR') == '2004'][!$this->get('PUBDATE')][5]
 
 gets the first five articles from 2004, sorted on publication date.
   
-  bibtexquery:[bibfile.bib][strpos($this->get('AUTHOR'),'John Doe')!==FALSE][!$this->get('PUBDATE')][100]  
+    bibtexquery:[bibfile.bib][strpos($this->get('AUTHOR'),'John Doe')!==FALSE][!$this->get('PUBDATE')][100]  
 
 Get the articles with 'John Doe' in the author list. A simular construct can
 also be used to search for words in the titel, abstract, etc. The '!==FALSE'
