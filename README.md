@@ -3,9 +3,13 @@ pmwiki-bibtexref
 
 This little script allows you to display your bibtex bibliography into PmWiki
 in a convenient way and to put references to it. It introduces new markups and
-works directly over .bib files.  Comments, suggestions should go to
-Michael.Hauspie@lifl.fr.  You can see an example usage of this script at
+works directly over .bib files.
+
+You can see an example usage of a previous version of this script at
 http://www.lifl.fr/2XS/Team/Publications. It demonstrates the query feature.
+
+Another example is http://www.irit.fr/~Victor.Noel/Main/Publications.
+It uses the last version of this script.
 
 
 Installation
@@ -18,20 +22,28 @@ should have the following hierarchy:
 
 Then add
 
-  include 'cookbook/bibtexref/bibtexref2.php';
+  include 'cookbook/bibtexref/bibtexref3.php';
 
 to your config.php.
 
-
-Alternatively, you could use one of the newer, modified versions posted in the
-Comments section below. It is not required to install the script in its own
-"bibtexref" directory.
-
-You should also set the $BibtexBibDir variable to the location of your bibtex
-files. By default, the location would be the upload directory for the current
+You can set the $BibtexBibDir variable to the location of your bibtex
+files (in the filesystem). By default, the location would be the upload directory for the current
 page, which is probably not what you want.
 
+You can set the $BibtexPdfUrl variable to the location of your pdf files (as an url).
+
 Also, you should upload a pdf.gif image file for displaying links to pdfs.
+
+Bibtex Entries
+==============
+
+The notation followed is the one from biblatex.
+
+A Pdf field in a bibtex entry must either contain an absolute url (which will be use as is) or
+a filename (which should either be accessible via $BibtexPdfUrl if defined or attached to the current page).
+
+Alternatively, the File field notation from JabRef can be used but only for urls to pdfs.
+
 
 New actions
 ===========
@@ -83,6 +95,7 @@ Contributors
 * Michaël Hauspie (http://www.lifl.fr/~hauspie)
 * Yann Hodique (http://www.hodique.info/)
 * Romain Rouvoy (http://www.lifl.fr/~rouvoy)
+* Victor Noël (https://github.com/victornoel/)
 
 Copyright
 =========
