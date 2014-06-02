@@ -20,7 +20,7 @@ See the COPYING file for more details. */
 
 
 $BibtexPdfLink = "Attach:pdf.gif";
-$BibtexUrlLink = "(URL)";
+$BibtexUrlLink = "URL";
 $BibtexBibLink = "BibTeX";
 
 $BibtexGenerateDefaultUrlField = false;
@@ -67,7 +67,7 @@ class BibtexEntry {
 
     function getAuthors()
     {
-      $aut = $this->get('AUTHOR');
+      $aut = $this->getFormat('AUTHOR');
       if ($aut == FALSE) return FALSE;
       $aut = explode(" and ", $aut);
 
@@ -86,9 +86,9 @@ class BibtexEntry {
 
     function getEditors()
     {
-      $edi = $this->get('EDITOR');
+      $edi = $this->getFormat('EDITOR');
       if ($edi == FALSE) return FALSE;
-      $edi = explode("and", $edi);
+      $edi = explode(" and ", $edi);
 
       $ret = "";
 
@@ -243,34 +243,58 @@ class BibtexEntry {
 
       global $ScriptUrl, $BibtexUrlLink, $BibtexBibLink, $pagename;
 
-      $ret = ".";
+      $ret = "";
 
-      $url = $this->get("URL");
-      // Try and get url from bib2html_dl_pdf
-      if (!$url) 
-        $url = $this->get("bib2html_dl_pdf");
-      
-      if ($url) 
+      $note = $this->get("NOTE");
+      if ($note)
       {
-        $ret = $ret . " ([[" . $url . " | $BibtexUrlLink]])";
+        $ret = $ret . ". " . $note . ".";
+      } else
+        $ret = $ret . ".";
+
+      // This field comes from JabRef
+      $files = $this->get("FILE");
+      if ($files)
+      {
+        // from http://stackoverflow.com/a/8519822
+        $files = preg_split('~(?<!\\\)' . preg_quote(';', '~') . '~', $files);
+        foreach ($files as $file)
+        {
+          $file = str_replace("\;", ";", $file);
+          $file = preg_split('~(?<!\\\)' . preg_quote(':', '~') . '~', $file);
+          if ($file[2] == "PDF")
+          {
+            global $BibtexPdfLink;
+            $ret = $ret . " [[" . str_replace("\:", ":", $file[1]) . " | $BibtexPdfLink]]";
+          }
+        }
       }
 
       $pdf = $this->get("PDF");
       if ($pdf)
       {
-        global $BibtexPdfUrl, $BibtexPdfLink, $UploadUrlFmt;
-	if (strpos($pdf, "http") === FALSE)
+        // BibtexPdfUrl is an url path where the pdf are stored
+        // must be declared in config.php
+        global $BibtexPdfUrl, $BibtexPdfLink;
+        // TODO better url detection!
+	if (strpos($pdf, "http") === FALSE || strpos($pdf, "ftp") === FALSE)
 	{
-	        if (!$BibtexPdfUrl) 
-		   $BibtexPdfUrl = "Attach:";
+	  if (!$BibtexPdfUrl) 
+	    $BibtexPdfUrl = "Attach:";
 	}
 	else
-		$BibtexPdfUrl = "";
-        $ret = $ret . "[[$BibtexPdfUrl" . $pdf . " | $BibtexPdfLink]]";
+	  $BibtexPdfUrl = "";
+        $ret = $ret . " [[$BibtexPdfUrl" . $pdf . " | $BibtexPdfLink]]";
+      }
+
+      $url = $this->get("URL");
+      if ($url) 
+      {
+        $ret = $ret . " ([[" . $url . " | $BibtexUrlLink]])";
       }
 
       if ($dourl && $this->entryname != " ")
-          $ret = $ret . "([[" . $this->getCompleteEntryUrl() . "| $BibtexBibLink]])";
+        $ret = $ret . " ([[" . $this->getCompleteEntryUrl() . "| $BibtexBibLink]])";
 
       return $ret;
     }
@@ -350,7 +374,7 @@ class BibtexEntry {
     {
       $ret = parent::getPreString($dourl);
       $ret = $ret . " PhD thesis";
-      $school = parent::get("SCHOOL");
+      $school = parent::get("INSTITUTION");
       if ($school)
       {
         $ret = $ret . ", ''" . $school . "''";
@@ -374,7 +398,7 @@ class MasterThesis extends BibtexEntry {
     $ret = parent::getPreString($dourl);
 
     $ret = $ret . " Master's thesis";
-    $school = parent::get("SCHOOL");
+    $school = parent::get("INSTITUTION");
     if ($school)
     {
       $ret = $ret . ", ''" . $school . "''";
@@ -427,7 +451,7 @@ class Article extends BibtexEntry {
   function getSummary($dourl = true)
   {
     $ret = parent::getPreString($dourl);
-    $journal = parent::get("JOURNAL");
+    $journal = parent::get("JOURNALTITLE");
     if ($journal)
     {
       $ret = $ret . " " . $journal;
@@ -445,9 +469,14 @@ class Article extends BibtexEntry {
         {
           $ret = $ret . ":" . $pages;
         }
+        $publisher = parent::get("PUBLISHER");
+        if ($publisher)
+        {
+          $ret = $ret . ". " . $publisher;
+        }
       }
     }
-    return $ret . parent::getPostString($dourl);
+    return $ret . ". " . parent::getPostString($dourl);
   }
 }
 
@@ -488,7 +517,7 @@ class InProceedings extends BibtexEntry
                 $ret = $ret . " " . $month;
             }
             
-            $editor = parent::get("EDITOR");
+            $editor = parent::getEditors();
             if ($editor)
             {
                 if ($ret[strlen($ret)-1] != '.')
@@ -547,16 +576,23 @@ class InCollection extends BibtexEntry {
     if ($booktitle)
     {
         $ret = $ret . " In " . $booktitle . "";
+
+        $editor = parent::getEditors();
+        if ($editor)
+        {
+          $ret = $ret . " (" . $editor .", Eds.)";
+        }
+
         $pages = $this->getPagesWithLabel();
         if ($pages)
-            $ret = $ret . ", " . $pages . ". ";
+            $ret = $ret . ", " . $pages . ".";
 
         $publisher = parent::get("PUBLISHER");
         if ($publisher)
         {
             if ($ret[strlen($ret)-1] != '.')
                 $ret = $ret . ". ";
-            $ret = $ret . $publisher;
+            $ret = $ret . " " . $publisher;
         }
     }
     return $ret . parent::getPostString($dourl);
@@ -629,7 +665,7 @@ class InBook extends BibtexEntry {
         {
             $ret = $ret . " In " . $booktitle . ".";
            
-            $editor = parent::get("EDITOR");
+            $editor = parent::getEditors();
             if ($editor)
             {
                 if ($ret[strlen($ret)-1] != '.')
@@ -693,7 +729,7 @@ class Proceedings extends BibtexEntry {
       function getSummary($dourl = true)
       {
          $ret = parent::getPreString($dourl);
-         $editor = parent::get("EDITOR");
+         $editor = parent::getEditors();
          if ($editor)
              $ret = $ret . " (" . $editor .", Eds.)";
 
