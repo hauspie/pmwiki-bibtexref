@@ -277,13 +277,13 @@ class BibtexEntry {
         // must be declared in config.php
         global $BibtexPdfUrl, $BibtexPdfLink;
         // TODO better url detection!
-	if (strpos($pdf, "http") === FALSE || strpos($pdf, "ftp") === FALSE)
-	{
-	  if (!$BibtexPdfUrl) 
-	    $BibtexPdfUrl = "Attach:";
-	}
-	else
-	  $BibtexPdfUrl = "";
+        if (strpos($pdf, "http") === FALSE || strpos($pdf, "ftp") === FALSE)
+        {
+          if (!$BibtexPdfUrl) 
+            $BibtexPdfUrl = "Attach:";
+        }
+        else
+          $BibtexPdfUrl = "";
         $ret = $ret . " [[$BibtexPdfUrl" . $pdf . " | $BibtexPdfLink]]";
       }
 
