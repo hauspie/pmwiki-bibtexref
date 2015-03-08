@@ -32,6 +32,8 @@ Markup("bibtexcite","inline","/\\{\\[(.*?),(.*?)\\]\\}/e","BibCite('$1', '$2')")
 Markup("bibtexquery","fulltext","/\\bbibtexquery:\\[(.*?)\\]\\[(.*?)\\]\\[(.*?)\\]\\[(.*?)\\]/e","BibQuery('$1', '$2', '$3', '$4')");
 Markup("bibtexsummary","fulltext","/\\bbibtexsummary:\\[(.*?),(.*?)\\]/e","BibSummary('$1', '$2')");
 Markup("bibtexcomplete","fulltext","/\\bbibtexcomplete:\\[(.*?),(.*?)\\]/e","CompleteBibEntry('$1', '$2')");
+Markup("bibtexsummaryauthorbold","fulltext","/\\bbibtexsummaryauthorbold:\\[(.*?),(.*?),(.*?)\\]/e","BibSummaryAuthorFirst('$1', '$2', '$3')");                          
+
 
 
 SDV($HandleActions['bibentry'],'HandleBibEntry');
@@ -302,6 +304,101 @@ class BibtexEntry {
     function cite()
     {
       $ret = "([[" . $this->getCompleteEntryUrl() . " | " . $this->entryname . "]])";
+      return $ret;
+    }
+    # customized cite author method
+    function citeAuthorFirst($myName)
+    {
+      global $ScriptUrl, $BibtexUrlLink, $BibtexBibLink, $pagename;
+      $authors = $this->get("AUTHOR");
+      $tauthors = preg_split("/,/", $authors);
+      if (count($tauthors) <= 1) $tauthors = preg_split("/ and/", $authors);
+
+      $N = count($tauthors);
+      if ( $N>1 ){
+        if (strpos($tauthors[0],$myName) !== false) {
+          $ret.= "'''" . $tauthors[0] . "'''";
+        }else{
+          $ret.= "''" . $tauthors[0] . "''";
+        }
+        if ( $N > 2){
+          $ret.=",";
+          for ($i = 1; $i < $N-2; $i++) {
+            if (strpos($tauthors[$i],$myName) !== false) {
+              $ret.= "'''" . $tauthors[$i] . "'''";
+            }else{
+              $ret.= "''" . $tauthors[$i] . "''";
+            }
+            $ret.=",";
+          }
+          if (strpos($tauthors[$N-2],$myName) !== false) {
+            $ret.= "'''" . $tauthors[$N-2] . "'''";
+          }else{
+            $ret.= "''" . $tauthors[$N-2] . "''";
+          }
+        }
+        $ret.= " and ";
+        if (strpos($tauthors[$N-1],$myName) !== false) {
+          $ret.= "'''" . $tauthors[$N-1] . "'''";
+        }else{
+          $ret.= "''" . $tauthors[$N-1] . "''";
+        }
+        $ret .= "\\\\\n ";
+      }else{
+        if (strpos($tauthors[0],$myName) !== false) {
+          $ret.= "'''" . $tauthors[0] . "'''";
+        }else{
+          $ret.= "''" . $tauthors[0] . "''";
+        }
+        $ret .= "\\\\\n ";
+      }
+
+      $ret .= "[[" . $this->getCompleteEntryUrl() . " | " . $this->getTitle() . "]]" . "";
+      $booktitle = $this->get("BOOKTITLE");
+      if ($booktitle)
+      {
+      	$ret = $ret . ". In " . withAccent($booktitle) . "";
+      	$pages = $this->getPages();
+      	if ($pages) $ret = $ret . ", " . $pages;
+      	$address = $this->get("ADDRESS");
+      	if ($address) $ret = $ret . ", " . $address;
+      	$organization = $this->get("ORGANIZATION");
+      	if ($organization) $ret = $ret . ". " . $organization;
+      }
+
+      $year = $this->get("YEAR");
+      if ($year)
+      {
+      	$ret = $ret . ", ";
+      	$month = $this->get("MONTH");
+      	if ($month)
+      	{
+      	  $ret = $ret . $month . " ";
+      	}
+      	$ret = $ret . $year;
+      }
+
+      $note = $this->get("NOTE");
+      if ($note)
+      {
+      	$ret = $ret . ". (''$note'')";
+      }
+      $ret = $ret . ".";
+
+      $pdf = $this->get("PDF");
+      if ($pdf)
+      {
+      	global $BibtexPdfUrl, $BibtexPdfLink, $UploadUrlFmt;
+      	if (!$BibtexPdfUrl) $BibtexPdfUrl = FmtPageName('$UploadUrlFmt$UploadPrefixFmt', $pagename);
+      	if( substr($pdf,0,7) != "http://" )
+      	  $pdf = $BibtexPdfUrl . '/' . $pdf;
+      	$ret = $ret . " [[ " . $pdf . " | $BibtexPdfLink]][==]";
+      }
+
+      $ret .= " [[" . $this->getCompleteEntryUrl() . "#" . $this->entryname . "Bib | $BibtexBibLink]]";
+
+      $ret .= $this->getVideo(true);        
+
       return $ret;
     }
 
@@ -919,6 +1016,13 @@ function BibSummary($bib, $ref)
   if ($entry == false) return "%red%Invalid BibTex Entry!";
   return $entry->getSummary();
 }
+function BibSummaryAuthorFirst($bib, $ref, $myName) 
+{ 
+  $entry = GetEntry($bib, $ref); 
+  if ($entry == false) return "%red%Invalid BibTex Entry!"; 
+  return $entry->citeAuthorFirst($myName); 
+}
+
 
 function ParseEntries($fname, $entries)
 {
