@@ -88,6 +88,12 @@ also be used to search for words in the titel, abstract, etc. The '!==FALSE'
 construct is necessary because 'strpos' will return 0 when the field begins
 with your keyword.  
 
+You can also have the author list first, and highlight a particular NAME in
+bold, which is useful to show where NAME appears in a publications
+
+    bibtexsummaryauthorbold:[bibfile.bib,reference,NAME].
+
+
 Contributors
 ============
 
