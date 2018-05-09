@@ -978,6 +978,9 @@ function GetEntry($bib, $ref)
     {
       ParseBibFile($bib);
       $bibtable = $BibEntries[$bib];
+      # exit if file still not found
+      if ($bibtable == false)
+        return false;
     }
     
     reset($bibtable);
@@ -1132,26 +1135,25 @@ function ParseBibFile($bib_file)
         if (!$BibtexBibDir)
             $BibtexBibDir = FmtPageName('$UploadDir$UploadPrefixFmt', $pagename);
     
-        if (file_exists($BibtexBibDir . $bib_file))
+        # try to open file
+        $f = fopen($BibtexBibDir . $bib_file, "r");
+        $bib_file_string = "";
+
+        if ($f)
         {
-            $f = fopen($BibtexBibDir . $bib_file, "r");
-            $bib_file_string = "";
-
-            if ($f)
+            while (!feof($f))
             {
-                while (!feof($f))
-                {
-                    $bib_file_string = $bib_file_string . fgets($f, 1024);
-                }
-
-                $bib_file_string = preg_replace("/\n/", "", $bib_file_string);
-
-                ParseBib($bib_file, $bib_file_string);
-
-                return true;
+                $bib_file_string = $bib_file_string . fgets($f, 1024);
             }
-            return false;
+
+            $bib_file_string = preg_replace("/\n/", "", $bib_file_string);
+
+            ParseBib($bib_file, $bib_file_string);
+
+            return true;
         }
+
+        return false;
     }
 }
 
