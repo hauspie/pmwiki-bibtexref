@@ -27,12 +27,12 @@ $BibtexGenerateDefaultUrlField = false;
 
 $BibtexLang = array();
 
-Markup("bibtexcite","inline","/\\{\\[(.*?),(.*?)\\]\\}/e","BibCite('$1', '$2')");
+Markup("bibtexcite","inline","/\\{\\[(.*?),(.*?)\\]\\}/", function ($m) { return BibCite($m[1], $m[2]); } );
 
-Markup("bibtexquery","fulltext","/\\bbibtexquery:\\[(.*?)\\]\\[(.*?)\\]\\[(.*?)\\]\\[(.*?)\\]/e","BibQuery('$1', '$2', '$3', '$4')");
-Markup("bibtexsummary","fulltext","/\\bbibtexsummary:\\[(.*?),(.*?)\\]/e","BibSummary('$1', '$2')");
-Markup("bibtexcomplete","fulltext","/\\bbibtexcomplete:\\[(.*?),(.*?)\\]/e","CompleteBibEntry('$1', '$2')");
-Markup("bibtexsummaryauthorbold","fulltext","/\\bbibtexsummaryauthorbold:\\[(.*?),(.*?),(.*?)\\]/e","BibSummaryAuthorFirst('$1', '$2', '$3')");                          
+Markup("bibtexquery","fulltext","/\\bbibtexquery:\\[(.*?)\\]\\[(.*?)\\]\\[(.*?)\\]\\[(.*?)\\]/", function ($m) { return BibQuery($m[1], $m[2], $m[3], $m[4]); } );
+Markup("bibtexsummary","fulltext","/\\bbibtexsummary:\\[(.*?),(.*?)\\]/", function ($m) { return BibSummary($m[1], $m[2]); } );
+Markup("bibtexcomplete","fulltext","/\\bbibtexcomplete:\\[(.*?),(.*?)\\]/", function ($m) { return CompleteBibEntry($m[1], $m[2]); } );
+Markup("bibtexsummaryauthorbold","fulltext","/\\bbibtexsummaryauthorbold:\\[(.*?),(.*?),(.*?)\\]/", function ($m) { return BibSummaryAuthorFirst($m[1], $m[2], $m[3]); } );
 
 
 
