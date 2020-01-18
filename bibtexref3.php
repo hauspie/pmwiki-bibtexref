@@ -27,14 +27,17 @@ $BibtexGenerateDefaultUrlField = false;
 
 $BibtexLang = array();
 
-Markup("bibtexcite","inline","/\\{\\[(.*?),(.*?)\\]\\}/e","BibCite('$1', '$2')");
+Markup("bibtexcite","inline","/\\{\\[(.*?),(.*?)\\]\\}/","BibCite_callback");
+Markup("bibtexquery","fulltext","/\\bbibtexquery:\\[(.*?)\\]\\[(.*?)\\]\\[(.*?)\\]\\[(.*?)\\]/","BibQuery_callback");
+Markup("bibtexsummary","fulltext","/\\bbibtexsummary:\\[(.*?),(.*?)\\]/","BibSummary_callback");
+Markup("bibtexcomplete","fulltext","/\\bbibtexcomplete:\\[(.*?),(.*?)\\]/","CompleteBibEntry_callback");
+Markup("bibtexsummaryauthorbold","fulltext","/\\bbibtexsummaryauthorbold:\\[(.*?),(.*?),(.*?)\\]/","BibSummaryAuthorFirst_callback");
 
-Markup("bibtexquery","fulltext","/\\bbibtexquery:\\[(.*?)\\]\\[(.*?)\\]\\[(.*?)\\]\\[(.*?)\\]/e","BibQuery('$1', '$2', '$3', '$4')");
-Markup("bibtexsummary","fulltext","/\\bbibtexsummary:\\[(.*?),(.*?)\\]/e","BibSummary('$1', '$2')");
-Markup("bibtexcomplete","fulltext","/\\bbibtexcomplete:\\[(.*?),(.*?)\\]/e","CompleteBibEntry('$1', '$2')");
-Markup("bibtexsummaryauthorbold","fulltext","/\\bbibtexsummaryauthorbold:\\[(.*?),(.*?),(.*?)\\]/e","BibSummaryAuthorFirst('$1', '$2', '$3')");                          
-
-
+function BibCite_callback($v){ return BibCite($v[1], $v[2]); }
+function BibQuery_callback($v){ return BibQuery($v[1], $v[2], $v[3], $v[4]); }
+function BibSummary_callback($v){ return BibSummary($v[1], $v[2]); }
+function CompleteBibEntry_callback($v){ return CompleteBibEntry($v[1], $v[2]); }
+function BibSummaryAuthorFirst_callback($v){ return BibSummaryAuthorFirst($v[1], $v[2], $v[3]); }
 
 SDV($HandleActions['bibentry'],'HandleBibEntry');
 
@@ -1051,7 +1054,7 @@ function ParseEntries($fname, $entries)
       else $entry = new Misc($fname, $entryname);
 
       // match all keys
-      preg_match_all("/(\w+)\s*=\s*([^¶]+)¶?/", $entries[3][$i], $all_keys);
+      preg_match_all("/(\w+)\s*=\s*([^Â¶]+)Â¶?/", $entries[3][$i], $all_keys);
 
       
       for ($j = 0 ; $j < count($all_keys[0]) ; $j++)
@@ -1086,26 +1089,26 @@ function ParseBib($bib_file, $bib_file_string)
       if ($bib_file_string[$i] == '{')
       {
          if ($count==0)
-            $bib_file_string[$i] = '¤';
+            $bib_file_string[$i] = 'Â¤';
          $count++;
       }
       else if ($bib_file_string[$i] == '}')
       {
          $count--;
          if ($count==0)
-            $bib_file_string[$i] = '¤';
+            $bib_file_string[$i] = 'Â¤';
       }
       else if ($bib_file_string[$i] == ',' && $count == 1)
       {
-        $bib_file_string[$i] = '¶';
+        $bib_file_string[$i] = 'Â¶';
       }
       else if ($bib_file_string[$i] == "\r" && $count == 1)
-        $bib_file_string[$i] = '¶';
+        $bib_file_string[$i] = 'Â¶';
    }
 
-   $bib_file_string = preg_replace("/¶¶/", "¶", $bib_file_string);
+   $bib_file_string = preg_replace("/Â¶Â¶/", "Â¶", $bib_file_string);
    
-   $nb_bibentry = preg_match_all("/@(\w+)\s*¤\s*([^¶]*)¶([^¤]*)¤/", $bib_file_string, $matches);
+   $nb_bibentry = preg_match_all("/@(\w+)\s*Â¤\s*([^Â¶]*)Â¶([^Â¤]*)Â¤/", $bib_file_string, $matches);
 
    ParseEntries($bib_file, $matches);
 }
