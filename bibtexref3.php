@@ -27,14 +27,6 @@ $BibtexGenerateDefaultUrlField = false;
 
 $BibtexLang = array();
 
-/* This does not work in recent versions of PHP
-Markup("bibtexcite","inline","/\\{\\[(.*?),(.*?)\\]\\}/e","BibCite('$1', '$2')");
-Markup("bibtexquery","fulltext","/\\bbibtexquery:\\[(.*?)\\]\\[(.*?)\\]\\[(.*?)\\]\\[(.*?)\\]/e","BibQuery('$1', '$2', '$3', '$4')");
-Markup("bibtexsummary","fulltext","/\\bbibtexsummary:\\[(.*?),(.*?)\\]/e","BibSummary('$1', '$2')");
-Markup("bibtexcomplete","fulltext","/\\bbibtexcomplete:\\[(.*?),(.*?)\\]/e","CompleteBibEntry('$1', '$2')");
-Markup("bibtexsummaryauthorbold","fulltext","/\\bbibtexsummaryauthorbold:\\[(.*?),(.*?),(.*?)\\]/e","BibSummaryAuthorFirst('$1', '$2', '$3')");                          
-*/
-
 Markup("bibtexcite","inline","/\\{\\[(.*?),(.*?)\\]\\}/","BibCite_callback");
 Markup("bibtexquery","fulltext","/\\bbibtexquery:\\[(.*?)\\]\\[(.*?)\\]\\[(.*?)\\]\\[(.*?)\\]/","BibQuery_callback");
 Markup("bibtexsummary","fulltext","/\\bbibtexsummary:\\[(.*?),(.*?)\\]/","BibSummary_callback");
